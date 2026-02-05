@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANPASA | Sistema de Planeación</title>
+    <style>
+        :root { 
+            --dark: #0f172a; --blue: #2563eb; --green: #16a34a; --bg: #f8fafc; --white: #ffffff;
+        }
+        
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); color: #1e293b; padding-bottom: 80px; }
+        
+        /* Header y Navegación */
+        header { 
+            background: var(--dark); color: white; padding: 15px; 
+            position: sticky; top: 0; z-index: 1000; text-align: center;
+        }
+        .nav-tabs { display: flex; justify-content: center; background: #1e293b; padding: 10px; gap: 10px; }
+        .tab-btn { 
+            background: #334155; color: white; border: none; padding: 10px 20px; 
+            border-radius: 8px; cursor: pointer; font-weight: bold; flex: 1; max-width: 150px;
+        }
+        .tab-btn.active { background: var(--blue); }
+
+        /* Contenedores de Vista */
+        .view-section { display: none; padding: 20px; animation: fadeIn 0.3s; }
+        .view-section.active { display: block; }
+
+        /* VISTA SEMANAL (ESTILO TABLERO) */
+        .weekly-board { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; }
+        .day-column { 
+            background: #eef2f6; border-radius: 12px; min-width: 250px; flex: 1;
+            min-height: 400px; border: 1px solid #e2e8f0;
+        }
+        .day-header { 
+            background: var(--white); padding: 12px; text-align: center; 
+            font-weight: bold; border-radius: 12px 12px 0 0; border-bottom: 2px solid var(--blue);
+        }
+
+        /* VISTA MENSUAL (CUADRÍCULA) */
+        .month-selector { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
+        .calendar-grid { 
+            display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; 
+            background: #cbd5e1; border: 1px solid #cbd5e1;
+        }
+        .cal-header { background: #334155; color: white; padding: 10px; text-align: center; font-size: 12px; }
+        .cal-cell { 
+            background: white; min-height: 80px; padding: 5px; position: relative; cursor: pointer;
+        }
+        .cal-cell:hover { background: #f1f5f9; }
+        .cal-cell.today { background: #eff6ff; border: 2px solid var(--blue); }
+        .cal-num { font-weight: bold; color: #94a3b8; font-size: 12px; }
+
+        /* VISTA ANUAL */
+        .year-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .year-month-card { background: white; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #ddd; }
+
+        /* Tarjetas de Actividad */
+        .card { 
+            background: white; border-radius: 6px; padding: 10px; margin: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 5px solid #ccc;
+        }
+        .card.entrega { border-left-color: var(--blue); }
+        .card.devolucion { border-left-color: var(--green); }
+        .card-t { font-weight: bold; font-size: 13px; display: block; }
+
+        /* Botón Flotante */
+        .btn-float { 
+            position: fixed; bottom: 20px; right: 20px; background: var(--blue); 
+            color: white; border: none; padding: 15px 25px; border-radius: 50px; 
+            font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Responsivo para Móvil */
+        @media (max-width: 768px) {
+            .calendar-grid { grid-template-columns: repeat(7, 1fr); font-size: 10px; }
+            .cal-cell { min-height: 50px; }
+            .weekly-board { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h2 style="margin:0">ANPASA | Programador Operativo</h2>
+</header>
+
+<div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchView('week')">Semanal</button>
+    <button class="tab-btn" onclick="switchView('month')">Mensual</button>
+    <button class="tab-btn" onclick="switchView('year')">Anual</button>
+</div>
+
+<section id="view-week" class="view-section active">
+    <div class="weekly-board" id="weekly-board">
+        </div>
+</section>
+
+<section id="view-month" class="view-section">
+    <div class="month-selector">
+        <select id="m-select" onchange="renderMonthly()"></select>
+        <select id="y-select" onchange="renderMonthly()"></select>
+    </div>
+    <div class="calendar-grid" id="calendar-grid"></div>
+</section>
+
+<section id="view-year" class="view-section">
+    <div class="year-grid" id="year-grid"></div>
+</section>
+
+<button class="btn-float" onclick="alert('Abrir Formulario')">+ Nueva Orden</button>
+
+<script>
+    const state = {
+        view: 'week',
+        currentDate: new Date(),
+        actividades: [
+            { fecha: '2026-02-05', cliente: 'Cliente Ejemplo', tipo: 'entrega', detalle: 'Entrega 10 unidades' }
+        ]
+    };
+
+    const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    const dias = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
+    function switchView(view) {
+        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`view-${view}`).classList.add('active');
+        event.target.classList.add('active');
+        if(view === 'week') renderWeekly();
+        if(view === 'month') renderMonthly();
+        if(view === 'year') renderAnnual();
+    }
+
+    function renderWeekly() {
+        const board = document.getElementById('weekly-board');
+        board.innerHTML = '';
+        const startOfWeek = new Date(state.currentDate);
+        startOfWeek.setDate(state.currentDate.getDate() - state.currentDate.getDay());
+
+        for(let i = 0; i < 7; i++) {
+            const day = new Date(startOfWeek);
+            day.setDate(startOfWeek.getDate() + i);
+            const dateStr = day.toISOString().split('T')[0];
+            
+            const col = document.createElement('div');
+            col.className = 'day-column';
+            col.innerHTML = `
+                <div class="day-header">${dias[i]} ${day.getDate()}</div>
+                <div class="task-list">
+                    ${state.actividades.filter(a => a.fecha === dateStr).map(a => `
+                        <div class="card ${a.tipo}">
+                            <span class="card-t">${a.cliente}</span>
+                            <small>${a.detalle}</small>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            board.appendChild(col);
+        }
+    }
+
+    function renderMonthly() {
+        const grid = document.getElementById('calendar-grid');
+        grid.innerHTML = '';
+        const m = parseInt(document.getElementById('m-select').value);
+        const y = parseInt(document.getElementById('y-select').value);
+        
+        dias.forEach(d => grid.innerHTML += `<div class="cal-header">${d}</div>`);
+        
+        const firstDay = new Date(y, m, 1).getDay();
+        const daysInMonth = new Date(y, m + 1, 0).getDate();
+
+        for(let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
+
+        for(let d = 1; d <= daysInMonth; d++) {
+            const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            const acts = state.actividades.filter(a => a.fecha === dateStr);
+            grid.innerHTML += `
+                <div class="cal-cell" onclick="alert('Detalles del día ${d}')">
+                    <span class="cal-num">${d}</span>
+                    ${acts.map(a => `<div style="width:5px; height:5px; background:var(--${a.tipo === 'entrega' ? 'blue' : 'green'}); border-radius:50%; display:inline-block;"></div>`).join('')}
+                </div>`;
+        }
+    }
+
+    function renderAnnual() {
+        const container = document.getElementById('year-grid');
+        container.innerHTML = '';
+        meses.forEach((m, i) => {
+            container.innerHTML += `<div class="year-month-card" onclick="document.getElementById('m-select').value=${i}; switchView('month')">
+                <strong>${m}</strong><br><small>Ver mes</small>
+            </div>`;
+        });
+    }
+
+    // Init selectores
+    const ms = document.getElementById('m-select');
+    const ys = document.getElementById('y-select');
+    meses.forEach((m, i) => ms.innerHTML += `<option value="${i}" ${i === state.currentDate.getMonth() ? 'selected' : ''}>${m}</option>`);
+    for(let y = 2024; y <= 2030; y++) ys.innerHTML += `<option value="${y}" ${y === state.currentDate.getFullYear() ? 'selected' : ''}>${y}</option>`;
+
+    renderWeekly();
+</script>
+</body>
+</html>
