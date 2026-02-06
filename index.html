@@ -3,52 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANPASA | Programador Operativo</title>
+    <title>ANPASA | Control Operativo Líneas</title>
     <style>
         :root { 
-            --dark: #0f172a; --blue: #2563eb; --green: #16a34a; --orange: #f59e0b; --bg: #f8fafc; --white: #ffffff; --red: #ef4444;
+            --dark: #0f172a; --blue: #2563eb; --green: #16a34a; --orange: #f59e0b; --bg: #f1f5f9; --white: #ffffff; --red: #ef4444;
         }
         
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); color: #1e293b; padding-bottom: 80px; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); color: #1e293b; padding-bottom: 20px; }
         
         header { background: var(--dark); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; text-align: center; }
-        .nav-tabs { display: flex; justify-content: center; background: #1e293b; padding: 10px; gap: 10px; }
+        .nav-tabs { display: flex; justify-content: center; background: #1e293b; padding: 10px; gap: 10px; position: sticky; top: 54px; z-index: 999; }
         .tab-btn { background: #334155; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; flex: 1; max-width: 120px; font-size: 13px; }
         .tab-btn.active { background: var(--blue); }
 
-        .view-section { display: none; padding: 20px; animation: fadeIn 0.3s; }
+        .view-section { display: none; padding: 15px; animation: fadeIn 0.3s; }
         .view-section.active { display: block; }
 
         /* VISTA SEMANAL */
-        .weekly-board { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; }
-        .day-column { background: #eef2f6; border-radius: 12px; min-width: 280px; flex: 1; min-height: 500px; border: 1px solid #e2e8f0; }
-        .day-header { background: var(--white); padding: 12px; text-align: center; font-weight: bold; border-radius: 12px 12px 0 0; border-bottom: 3px solid var(--blue); }
+        .weekly-board { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 20px; align-items: flex-start; }
+        .time-column { min-width: 60px; padding-top: 45px; color: #64748b; font-size: 11px; font-weight: bold; }
+        .time-slot-label { height: 90px; display: flex; align-items: flex-start; justify-content: flex-end; padding-right: 5px; }
 
-        /* TARJETAS MEJORADAS */
-        .card { background: white; border-radius: 8px; padding: 12px; margin: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 6px solid #ccc; position: relative; }
+        .day-column { background: #e2e8f0; border-radius: 10px; min-width: 260px; flex: 1; position: relative; border: 1px solid #cbd5e1; }
+        .day-header { background: var(--white); padding: 12px; text-align: center; font-weight: bold; border-radius: 10px 10px 0 0; border-bottom: 3px solid var(--blue); position: sticky; top: 0; z-index: 10; }
+        
+        .hour-grid { position: relative; height: 900px; background-image: linear-gradient(#cbd5e1 1px, transparent 1px); background-size: 100% 90px; }
+
+        /* TARJETAS */
+        .card { background: white; border-radius: 6px; padding: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 6px solid #ccc; position: absolute; left: 5px; right: 5px; overflow: hidden; z-index: 5; }
         .card.entrega { border-left-color: var(--blue); }
         .card.devolucion { border-left-color: var(--green); }
         .card.inventario { border-left-color: var(--orange); background: #fffbeb; }
         
-        .card-t { font-weight: bold; font-size: 14px; display: block; color: var(--dark); }
-        .card-info { font-size: 12px; color: #64748b; margin-top: 4px; line-height: 1.4; }
-        .btn-del { position: absolute; top: 8px; right: 8px; background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 16px; }
-        .btn-del:hover { color: var(--red); }
+        .card-t { font-weight: 800; font-size: 12px; display: block; margin-bottom: 2px; color: var(--dark); }
+        .line-badge { font-size: 9px; font-weight: bold; background: #f1f5f9; padding: 1px 4px; border-radius: 3px; color: #475569; display: inline-block; margin-bottom: 3px; border: 1px solid #cbd5e1; }
+        .card-info { font-size: 10px; color: #475569; line-height: 1.1; }
+        .btn-del { position: absolute; top: 2px; right: 2px; background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 16px; font-weight: bold; }
 
-        /* VISTA MENSUAL */
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; background: #cbd5e1; border: 1px solid #cbd5e1; }
-        .cal-header { background: #334155; color: white; padding: 10px; text-align: center; font-size: 11px; }
-        .cal-cell { background: white; min-height: 90px; padding: 5px; cursor: pointer; }
+        /* CALENDARIO MENSUAL */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; background: #cbd5e1; }
+        .cal-cell { background: white; min-height: 80px; padding: 5px; cursor: pointer; }
         .cal-num { font-weight: bold; color: #94a3b8; font-size: 12px; }
         .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 2px; }
 
-        /* MODAL / FORMULARIO */
+        /* MODAL */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
-        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
-        .btn-save { background: var(--blue); color: white; border: none; width: 100%; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 380px; max-height: 90vh; overflow-y: auto; }
+        label { font-size: 12px; font-weight: bold; color: #64748b; margin-top: 10px; display: block; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 4px 0 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        .btn-save { background: var(--blue); color: white; border: none; width: 100%; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        .btn-float { position: fixed; bottom: 25px; right: 25px; background: var(--blue); color: white; border: none; width: 60px; height: 60px; border-radius: 50%; font-size: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; z-index: 1500; }
+        .btn-float { position: fixed; bottom: 20px; right: 20px; background: var(--blue); color: white; border: none; width: 55px; height: 55px; border-radius: 50%; font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1500; cursor: pointer; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -56,17 +61,20 @@
 <body>
 
 <header>
-    <h2 style="margin:0">ANPASA | Programador Operativo</h2>
+    <h2 style="margin:0; font-size: 1.1rem;">ANPASA | Gestión de Equipos</h2>
 </header>
 
 <div class="nav-tabs">
-    <button class="tab-btn active" onclick="switchView('week')">Semanal</button>
-    <button class="tab-btn" onclick="switchView('month')">Mensual</button>
-    <button class="tab-btn" onclick="switchView('year')">Anual</button>
+    <button class="tab-btn active" id="btn-week" onclick="switchView('week')">Semanal</button>
+    <button class="tab-btn" id="btn-month" onclick="switchView('month')">Mensual</button>
+    <button class="tab-btn" id="btn-year" onclick="switchView('year')">Anual</button>
 </div>
 
 <section id="view-week" class="view-section active">
-    <div class="weekly-board" id="weekly-board"></div>
+    <div class="weekly-board">
+        <div class="time-column" id="time-labels"></div>
+        <div id="days-container" style="display: flex; gap: 10px; flex: 1;"></div>
+    </div>
 </section>
 
 <section id="view-month" class="view-section">
@@ -78,117 +86,158 @@
 </section>
 
 <section id="view-year" class="view-section">
-    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap:15px;" id="year-grid"></div>
+    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:10px;" id="year-grid"></div>
 </section>
 
 <button class="btn-float" onclick="abrirModal()">+</button>
 
 <div class="modal" id="modal">
     <div class="modal-content">
-        <h3 style="margin-top:0">Añadir Actividad</h3>
-        <input type="date" id="f-fecha">
+        <h3 style="margin:0 0 10px 0">Programar Actividad</h3>
+        
+        <label>Fecha y Hora</label>
+        <div style="display: flex; gap: 5px;">
+            <input type="date" id="f-fecha">
+            <select id="f-hora">
+                <option value="09:00">09:00 AM</option>
+                <option value="10:00">10:00 AM</option>
+                <option value="11:00">11:00 AM</option>
+                <option value="12:00">12:00 PM</option>
+                <option value="13:00">01:00 PM</option>
+                <option value="14:00">02:00 PM</option>
+                <option value="15:00">03:00 PM</option>
+                <option value="16:00">04:00 PM</option>
+                <option value="17:00">05:00 PM</option>
+                <option value="18:00">06:00 PM</option>
+            </select>
+        </div>
+
+        <label>Tipo de Movimiento</label>
         <select id="f-tipo" onchange="toggleCampos()">
             <option value="entrega">Entrega 🔵</option>
             <option value="devolucion">Devolución 🟢</option>
             <option value="inventario">Inventario 🟠</option>
         </select>
-        
+
         <div id="campos-logistica">
+            <label>Línea de Equipo</label>
+            <select id="f-linea">
+                <option value="COLGANTE">COLGANTE</option>
+                <option value="TUBULAR">TUBULAR</option>
+                <option value="MULTIDIRECCIONAL">MULTIDIRECCIONAL</option>
+            </select>
+            
             <input type="text" id="f-cliente" placeholder="Nombre del Cliente">
-            <input type="text" id="f-orden" placeholder="Número de Orden">
-            <input type="text" id="f-peso" placeholder="Peso (kg)">
+            <div style="display: flex; gap: 5px;">
+                <input type="text" id="f-orden" placeholder="N° Orden">
+                <input type="text" id="f-peso" placeholder="Peso (kg)">
+            </div>
         </div>
 
-        <textarea id="f-detalle" placeholder="Notas adicionales..."></textarea>
-        <button class="btn-save" onclick="guardarActividad()">Guardar Actividad</button>
-        <button onclick="cerrarModal()" style="width:100%; background:none; border:none; color:gray; margin-top:10px; cursor:pointer;">Cancelar</button>
+        <label>Notas</label>
+        <textarea id="f-detalle" rows="2" placeholder="Detalles extra..."></textarea>
+        
+        <button class="btn-save" onclick="guardarActividad()">Confirmar Agenda</button>
+        <button onclick="cerrarModal()" style="width:100%; background:none; border:none; color:gray; margin-top:10px; cursor:pointer;">Cerrar</button>
     </div>
 </div>
 
 <script>
     let actividades = JSON.parse(localStorage.getItem('anpasa_acts')) || [];
+    let vistaFecha = new Date();
+
+    const horasLaborales = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"];
 
     function switchView(view) {
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(`view-${view}`).classList.add('active');
-        if(event) event.target.classList.add('active');
-        
+        document.getElementById(`btn-${view}`).classList.add('active');
         if(view === 'week') renderWeekly();
         if(view === 'month') renderMonthly();
         if(view === 'year') renderAnnual();
     }
-
-    function abrirModal() { document.getElementById('modal').style.display = 'flex'; }
-    function cerrarModal() { document.getElementById('modal').style.display = 'none'; }
 
     function toggleCampos() {
         const tipo = document.getElementById('f-tipo').value;
         document.getElementById('campos-logistica').style.display = (tipo === 'inventario') ? 'none' : 'block';
     }
 
+    function abrirModal() { document.getElementById('modal').style.display = 'flex'; toggleCampos(); }
+    function cerrarModal() { document.getElementById('modal').style.display = 'none'; }
+
     function guardarActividad() {
         const act = {
             id: Date.now(),
             fecha: document.getElementById('f-fecha').value,
+            hora: document.getElementById('f-hora').value,
             tipo: document.getElementById('f-tipo').value,
+            linea: document.getElementById('f-linea').value,
             cliente: document.getElementById('f-cliente').value,
             orden: document.getElementById('f-orden').value,
             peso: document.getElementById('f-peso').value,
             detalle: document.getElementById('f-detalle').value
         };
-
-        if(!act.fecha) return alert("Selecciona una fecha");
-        
+        if(!act.fecha) return alert("Indica una fecha");
         actividades.push(act);
         localStorage.setItem('anpasa_acts', JSON.stringify(actividades));
         cerrarModal();
-        switchView('week');
+        renderWeekly();
     }
 
     function eliminarActividad(id) {
-        if(confirm('¿Eliminar esta actividad?')) {
+        if(confirm('¿Eliminar registro?')) {
             actividades = actividades.filter(a => a.id !== id);
             localStorage.setItem('anpasa_acts', JSON.stringify(actividades));
-            switchView('week');
+            renderWeekly();
         }
     }
 
     function renderWeekly() {
-        const board = document.getElementById('weekly-board');
-        board.innerHTML = '';
-        const hoy = new Date();
-        const inicio = new Date(hoy);
-        inicio.setDate(hoy.getDate() - hoy.getDay() + 1); // Lunes
+        const container = document.getElementById('days-container');
+        const timeLabels = document.getElementById('time-labels');
+        container.innerHTML = '';
+        timeLabels.innerHTML = horasLaborales.map(h => `<div class="time-slot-label">${h}</div>`).join('');
 
+        const inicioSemana = new Date(vistaFecha);
+        inicioSemana.setDate(vistaFecha.getDate() - vistaFecha.getDay() + 1);
         const diasNombre = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
         for(let i = 0; i < 7; i++) {
-            const d = new Date(inicio);
-            d.setDate(inicio.getDate() + (i - 1));
+            const d = new Date(inicioSemana);
+            d.setDate(inicioSemana.getDate() + (i - 1));
             const dateStr = d.toISOString().split('T')[0];
             
             const col = document.createElement('div');
             col.className = 'day-column';
-            col.innerHTML = `<div class="day-header">${diasNombre[d.getDay()]} ${d.getDate()}</div>`;
+            col.innerHTML = `<div class="day-header">${diasNombre[d.getDay()]} ${d.getDate()}</div><div class="hour-grid"></div>`;
             
-            const list = document.createElement('div');
+            const grid = col.querySelector('.hour-grid');
             actividades.filter(a => a.fecha === dateStr).forEach(a => {
-                const card = document.createElement('div');
-                card.className = `card ${a.tipo}`;
-                card.innerHTML = `
-                    <button class="btn-del" onclick="eliminarActividad(${a.id})">×</button>
-                    <span class="card-t">${a.tipo === 'inventario' ? '📦 INVENTARIO' : a.cliente}</span>
-                    <div class="card-info">
-                        ${a.tipo !== 'inventario' ? `Orden: ${a.orden}<br>Peso: ${a.peso}kg<br>` : ''}
-                        ${a.detalle}
-                    </div>
-                `;
-                list.appendChild(card);
+                const hourIndex = horasLaborales.indexOf(a.hora);
+                if(hourIndex !== -1) {
+                    const card = document.createElement('div');
+                    card.className = `card ${a.tipo}`;
+                    card.style.top = (hourIndex * 90 + 5) + "px";
+                    card.style.height = "80px";
+                    card.innerHTML = `
+                        <button class="btn-del" onclick="event.stopPropagation(); eliminarActividad(${a.id})">×</button>
+                        <span class="card-t">${a.tipo === 'inventario' ? '📦 INVENTARIO' : a.cliente}</span>
+                        ${a.tipo !== 'inventario' ? `<span class="line-badge">${a.linea}</span>` : ''}
+                        <div class="card-info">
+                            ${a.tipo !== 'inventario' ? `Orden: ${a.orden} | ${a.peso}kg` : a.detalle}
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                }
             });
-            col.appendChild(list);
-            board.appendChild(col);
+            container.appendChild(col);
         }
+    }
+
+    function irADia(fecha) {
+        vistaFecha = new Date(fecha + "T12:00:00");
+        switchView('week');
     }
 
     function renderMonthly() {
@@ -196,22 +245,23 @@
         grid.innerHTML = '';
         const m = parseInt(document.getElementById('m-select').value);
         const y = parseInt(document.getElementById('y-select').value);
-        const diasN = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+        ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].forEach(d => grid.innerHTML += `<div style="text-align:center; padding:5px; font-size:10px; font-weight:bold; color:#64748b;">${d}</div>`);
         
-        diasN.forEach(d => grid.innerHTML += `<div class="cal-header">${d}</div>`);
         const first = new Date(y, m, 1).getDay();
         const days = new Date(y, m + 1, 0).getDate();
-
         for(let i = 0; i < first; i++) grid.innerHTML += `<div></div>`;
 
         for(let d = 1; d <= days; d++) {
             const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
             const dayActs = actividades.filter(a => a.fecha === dateStr);
-            grid.innerHTML += `
-                <div class="cal-cell">
-                    <span class="cal-num">${d}</span><br>
-                    ${dayActs.map(a => `<span class="dot" style="background:var(--${a.tipo === 'entrega' ? 'blue' : (a.tipo === 'devolucion' ? 'green' : 'orange')})"></span>`).join('')}
-                </div>`;
+            const cell = document.createElement('div');
+            cell.className = 'cal-cell';
+            cell.onclick = () => irADia(dateStr);
+            cell.innerHTML = `
+                <span class="cal-num">${d}</span><br>
+                ${dayActs.map(a => `<span class="dot" style="background:var(--${a.tipo === 'entrega' ? 'blue' : (a.tipo === 'devolucion' ? 'green' : 'orange')})"></span>`).join('')}
+            `;
+            grid.appendChild(cell);
         }
     }
 
@@ -219,16 +269,18 @@
         const g = document.getElementById('year-grid'); g.innerHTML = '';
         const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         meses.forEach((m, i) => {
-            g.innerHTML += `<div style="background:white; padding:15px; border-radius:8px; text-align:center; cursor:pointer; border:1px solid #ddd;" onclick="document.getElementById('m-select').value=${i}; switchView('month')"><strong>${m}</strong></div>`;
+            const card = document.createElement('div');
+            card.style = "background:white; padding:15px; border-radius:8px; text-align:center; cursor:pointer; border:1px solid #ddd; font-weight:bold; font-size:14px;";
+            card.innerText = m;
+            card.onclick = () => { document.getElementById('m-select').value = i; renderMonthly(); switchView('month'); };
+            g.appendChild(card);
         });
     }
 
-    // Init
-    const ms = document.getElementById('m-select');
-    const ys = document.getElementById('y-select');
+    // Init selectores
     const mesesArr = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-    mesesArr.forEach((m, i) => ms.innerHTML += `<option value="${i}" ${i === new Date().getMonth() ? 'selected' : ''}>${m}</option>`);
-    for(let y = 2024; y <= 2030; y++) ys.innerHTML += `<option value="${y}" ${y === new Date().getFullYear() ? 'selected' : ''}>${y}</option>`;
+    mesesArr.forEach((m, i) => document.getElementById('m-select').innerHTML += `<option value="${i}" ${i === new Date().getMonth() ? 'selected' : ''}>${m}</option>`);
+    for(let y = 2024; y <= 2030; y++) document.getElementById('y-select').innerHTML += `<option value="${y}" ${y === new Date().getFullYear() ? 'selected' : ''}>${y}</option>`;
 
     renderWeekly();
 </script>
